@@ -8,7 +8,7 @@
 | Título | No cargan los datos |
 | Fecha | 2026-11-17 |
 | Autor | Ana Reina |
-| Estado | borrador |
+| Estado | completado |
 | Rama | fix/2-recarga-datos-restaurante |
 
 ## Objetivo y alcance
@@ -70,12 +70,12 @@
 
 ## Criterios de aceptación
 
-- [ ] Desde ingredientes del restaurante 1, pulsar ingredientes del restaurante 2 muestra los del 2.
-- [ ] Lo mismo con platos y empleados.
-- [ ] El dashboard del restaurante muestra el nombre del restaurante actual al cambiar de uno a otro.
-- [ ] Una respuesta lenta de un restaurante anterior no pisa los datos del actual.
-- [ ] Todos los tests pasan
-- [ ] Todas las tareas están marcadas
+- [x] Desde ingredientes del restaurante 1, pulsar ingredientes del restaurante 2 muestra los del 2.
+- [x] Lo mismo con platos y empleados.
+- [x] El dashboard del restaurante muestra el nombre del restaurante actual al cambiar de uno a otro.
+- [x] Una respuesta lenta de un restaurante anterior no pisa los datos del actual.
+- [x] Todos los tests pasan
+- [x] Todas las tareas están marcadas
 
 ## Dudas abiertas
 
