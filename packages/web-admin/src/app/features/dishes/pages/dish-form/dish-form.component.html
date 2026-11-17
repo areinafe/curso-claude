@@ -55,9 +55,9 @@
           @for (ing of form.ingredients; track ing.ingredientId) {
             <div class="ingredient-chip">
               <span>{{ getIngredientName(ing.ingredientId) }} — {{ ing.quantity }}</span>
-              <div class="chip-remove" (click)="removeIngredient(ing.ingredientId)">
+              <button type="button" class="chip-remove" [attr.aria-label]="'Quitar ' + getIngredientName(ing.ingredientId)" (click)="removeIngredient(ing.ingredientId)">
                 <lucide-icon aria-hidden="true" name="trash-2" [size]="12"></lucide-icon>
-              </div>
+              </button>
             </div>
           }
         </div>
@@ -73,21 +73,21 @@
         </select>
         <label for="new-ingredient-qty" class="visually-hidden">Cantidad</label>
         <input id="new-ingredient-qty" type="number" class="form-control qty-input" [(ngModel)]="newIngredientQty" name="newIngredientQty" placeholder="Cant." />
-        <div class="btn btn-secondary btn-sm" (click)="addIngredient()">
+        <button type="button" class="btn btn-secondary btn-sm" aria-label="Añadir ingrediente" (click)="addIngredient()">
           <lucide-icon aria-hidden="true" name="plus" [size]="14"></lucide-icon>
-        </div>
+        </button>
       </div>
     </div>
 
     <div class="form-actions">
-      <div class="btn btn-secondary" [routerLink]="listUrl">Cancelar</div>
-      <div class="btn btn-primary" (click)="onSubmit()">
+      <a class="btn btn-secondary" [routerLink]="listUrl">Cancelar</a>
+      <button type="button" class="btn btn-primary" (click)="onSubmit()">
         @if (loading()) {
           Guardando...
         } @else {
           Guardar
         }
-      </div>
+      </button>
     </div>
   </div>
 </div>

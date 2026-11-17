@@ -2,6 +2,7 @@ import { signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideRouter } from '@angular/router'
 import { LucideAngularModule, ChevronLeft, Plus, Trash2 } from 'lucide-angular'
+import type { Ingredient } from '../../../ingredients/models/ingredient.model'
 import { IngredientStore } from '../../../ingredients/store/ingredient.store'
 import { DishService } from '../../services/dish.service'
 import { DishStore } from '../../store/dish.store'
@@ -9,11 +10,15 @@ import { DishFormComponent } from './dish-form.component'
 
 describe('DishFormComponent (accesibilidad)', () => {
   let fixture: ComponentFixture<DishFormComponent>
+  const ingredientes = signal<Ingredient[]>([])
   let dishStore: { create: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> }
 
   const root = () => fixture.nativeElement as HTMLElement
 
   beforeEach(async () => {
+    ingredientes.set([
+      { id: 'i1', name: 'Tomate', unit: 'kg', currentStock: 1, restaurantId: 'rest-1', createdAt: '', updatedAt: '' }
+    ])
     dishStore = { create: vi.fn().mockResolvedValue(undefined), update: vi.fn().mockResolvedValue(undefined) }
     await TestBed.configureTestingModule({
       imports: [LucideAngularModule.pick({ ChevronLeft, Plus, Trash2 })],
@@ -21,7 +26,7 @@ describe('DishFormComponent (accesibilidad)', () => {
         provideRouter([]),
         { provide: DishStore, useValue: dishStore },
         { provide: DishService, useValue: {} },
-        { provide: IngredientStore, useValue: { ingredients: signal([]), loadByRestaurant: vi.fn() } }
+        { provide: IngredientStore, useValue: { ingredients: ingredientes, loadByRestaurant: vi.fn() } }
       ]
     }).compileComponents()
     fixture = TestBed.createComponent(DishFormComponent)
@@ -61,5 +66,27 @@ describe('DishFormComponent (accesibilidad)', () => {
     const iconos = Array.from(root().querySelectorAll('lucide-icon'))
     expect(iconos.length).toBeGreaterThan(0)
     expect(iconos.every(i => i.getAttribute('aria-hidden') === 'true')).toBe(true)
+  })
+
+  it('usa botones y enlaces reales con nombre accesible', () => {
+    const component = fixture.componentInstance
+    const botones = (nombre: string) =>
+      Array.from(root().querySelectorAll('button')).filter(b => (b.getAttribute('aria-label') ?? b.textContent ?? '').trim() === nombre)
+
+    expect(botones('Guardar')).toHaveLength(1)
+    expect(Array.from(root().querySelectorAll('a')).some(a => a.textContent?.trim() === 'Cancelar')).toBe(true)
+    const anadir = botones('Añadir ingrediente')[0]
+    expect(anadir?.getAttribute('type')).toBe('button')
+
+    component.newIngredientId = 'i1'
+    anadir.click()
+    fixture.detectChanges()
+
+    expect(component.form.ingredients).toEqual([{ ingredientId: 'i1', quantity: 1 }])
+    const quitar = botones('Quitar Tomate (kg)')[0]
+    expect(quitar?.getAttribute('type')).toBe('button')
+    quitar.click()
+    fixture.detectChanges()
+    expect(component.form.ingredients).toEqual([])
   })
 })

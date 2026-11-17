@@ -69,6 +69,7 @@ textarea.form-control {
 }
 
 .chip-remove {
+  border: none;
   background: transparent;
   color: var(--text-muted);
   padding: 2px;

@@ -49,7 +49,7 @@
 - [x] **T4 – Encabezados y estructura**
   - Test: existe un único `h1` con el título de página y un `h2` "Ingredientes del plato" (`dish-form.component.spec.ts`).
   - Código: `fake-title` → `h1`, `fake-subtitle` → `h2`; el enlace de volver con `aria-label="Volver a platos"`; `lucide-icon` decorativos con `aria-hidden` (`dish-form.component.html`).
-- [ ] **T5 – Botones reales operables con teclado**
+- [x] **T5 – Botones reales operables con teclado**
   - Test: "Guardar", "Cancelar" (enlace), "Añadir ingrediente" y "Quitar <ingrediente>" son `button`/`a` con nombre accesible; pulsar Enter/Espacio sobre "Añadir" añade el ingrediente (`dish-form.component.spec.ts`).
   - Código: `div.btn` → `<button type="button">`, `chip-remove` → `<button aria-label="Quitar …">`, botones solo con icono con `aria-label` (`dish-form.component.html`).
 - [ ] **T6 – Envolver en `<form>` y enviar con Enter**
