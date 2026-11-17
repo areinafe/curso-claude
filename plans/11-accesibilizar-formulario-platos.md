@@ -46,7 +46,7 @@
 - [x] **T3 – Etiquetas asociadas a cada control**
   - Test: Vitest + `TestBed`: `getByLabel`-equivalente — cada `input/select/textarea` tiene un `label[for]` con su `id` y el texto correcto (`dish-form.component.spec.ts`).
   - Código: sustituir `div.fake-label` por `<label for>` y añadir `id`s (`dish-form.component.html`).
-- [ ] **T4 – Encabezados y estructura**
+- [x] **T4 – Encabezados y estructura**
   - Test: existe un único `h1` con el título de página y un `h2` "Ingredientes del plato" (`dish-form.component.spec.ts`).
   - Código: `fake-title` → `h1`, `fake-subtitle` → `h2`; el enlace de volver con `aria-label="Volver a platos"`; `lucide-icon` decorativos con `aria-hidden` (`dish-form.component.html`).
 - [ ] **T5 – Botones reales operables con teclado**

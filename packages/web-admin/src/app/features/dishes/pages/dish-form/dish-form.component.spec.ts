@@ -49,4 +49,17 @@ describe('DishFormComponent (accesibilidad)', () => {
       expect(label?.textContent, `etiqueta de ${name}`).toContain(texto)
     }
   })
+
+  it('usa encabezados semánticos y oculta los iconos decorativos', () => {
+    const h1 = root().querySelectorAll('h1')
+    expect(h1).toHaveLength(1)
+    expect(h1[0].textContent).toContain('Nuevo plato')
+    const h2 = root().querySelectorAll('h2')
+    expect(h2).toHaveLength(1)
+    expect(h2[0].textContent).toContain('Ingredientes del plato')
+    expect(root().querySelector('a.back-link')?.getAttribute('aria-label')).toBe('Volver a platos')
+    const iconos = Array.from(root().querySelectorAll('lucide-icon'))
+    expect(iconos.length).toBeGreaterThan(0)
+    expect(iconos.every(i => i.getAttribute('aria-hidden') === 'true')).toBe(true)
+  })
 })
