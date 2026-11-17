@@ -1,3 +1,8 @@
+/* Rojo más claro que --red para alcanzar contraste 4.5:1 sobre el fondo oscuro (WCAG 1.4.3) */
+:host {
+  --error-text: #f87171;
+}
+
 .header-back {
   display: flex;
   align-items: center;
@@ -151,7 +156,11 @@ select.form-control {
 
 .field-error {
   font-size: 13px;
-  color: var(--red);
+  color: var(--error-text);
+}
+
+.alert-error {
+  color: var(--error-text);
 }
 
 .alert-error ul {

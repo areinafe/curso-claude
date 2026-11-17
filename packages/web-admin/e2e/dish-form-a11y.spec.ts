@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { test, expect } from './fixtures'
 
 test('el fixture inicia sesión y llega al formulario de nuevo plato', async ({ dishFormPage }) => {
@@ -55,4 +56,28 @@ test('el orden de tabulación sigue el orden visual y no hay tabindex positivos'
 
   await page.keyboard.press('Shift+Tab')
   await expect(page.locator('main').getByRole('link', { name: 'Cancelar' })).toBeFocused()
+})
+
+const ETIQUETAS_WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
+const analizar = async (page: import('@playwright/test').Page) => {
+  await page.waitForFunction(() => {
+    const el = document.querySelector('main .fade-in')
+    return !!el && getComputedStyle(el).opacity === '1' && document.getAnimations().every(a => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity)
+  })
+  // Espera a que terminen las animaciones (fade-in) para que axe calcule bien los contrastes
+  await page.evaluate(() => Promise.all(document.getAnimations().filter(a => a.effect?.getComputedTiming().iterations !== Infinity).map(a => a.finished.catch(() => undefined))))
+  return new AxeBuilder({ page }).include('main').withTags(ETIQUETAS_WCAG).analyze()
+}
+const resumen = (v: { id: string; nodes: { target: unknown }[] }[]) => v.map(x => `${x.id}: ${x.nodes.map(n => String(n.target)).join(' | ')}`)
+
+test('axe no encuentra violaciones WCAG 2.2 AA en el formulario vacío', async ({ dishFormPage: page }) => {
+  const { violations } = await analizar(page)
+  expect(resumen(violations)).toEqual([])
+})
+
+test('axe no encuentra violaciones WCAG 2.2 AA con errores de validación', async ({ dishFormPage: page }) => {
+  await page.getByRole('button', { name: 'Guardar' }).click()
+  await expect(page.getByRole('alert')).toBeVisible()
+  const { violations } = await analizar(page)
+  expect(resumen(violations)).toEqual([])
 })

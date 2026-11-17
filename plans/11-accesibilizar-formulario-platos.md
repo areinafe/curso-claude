@@ -71,7 +71,7 @@
   - Test: Playwright con Tab recorre en orden: volver → nombre → precio → categoría → disponible → descripción → selector ingrediente → cantidad → añadir → cancelar → guardar (`e2e/dish-form-a11y.spec.ts`).
   - Código: ajustar DOM si el orden difiere; sin `tabindex` positivos (`dish-form.component.html`).
   - Nota: el test pasó a la primera sin cambios de código, porque el orden del DOM ya era lógico tras T3–T6; queda como test de regresión.
-- [ ] **T12 – Revisión automática con axe**
+- [x] **T12 – Revisión automática con axe**
   - Test: `@axe-core/playwright` sobre el formulario vacío y con errores no devuelve violaciones WCAG 2.2 AA (`e2e/dish-form-a11y.spec.ts`).
   - Código: corregir lo que reporte (`dish-form.component.*`).
 - [ ] **T13 – Vídeo de uso con teclado**
