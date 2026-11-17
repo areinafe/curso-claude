@@ -30,6 +30,7 @@ npm run dev:admin        # ng serve con proxy /api -> :3000
 npm run dev:empleados
 npm run dev:clientes
 npm test                 # vitest run en packages/api
+npm run test -w @resttek/web-admin   # ng test (Vitest + jsdom) en web-admin
 ```
 
 Ejecutar un solo test o filtrar (desde `packages/api`):
@@ -40,7 +41,7 @@ npx vitest run -t "nombre del test"
 npm run test:watch
 ```
 
-Build de un frontend: `npm run build -w @resttek/web-admin` (igual para las otras apps). No hay script de lint ni tests en los frontends.
+Build de un frontend: `npm run build -w @resttek/web-admin` (igual para las otras apps). No hay script de lint. Solo `web-admin` tiene tests (`*.spec.ts` junto al código, `npm run test -w @resttek/web-admin`); `web-empleados` y `web-clientes` no tienen.
 
 Credenciales de prueba tras el seed (la contraseña es el propio email): `admin@resttek.com`, `gerente1@resttek.com` (rol `manager`), `cocinero1@resttek.com`, `camarero1@resttek.com`, `cliente1@resttek.com`.
 

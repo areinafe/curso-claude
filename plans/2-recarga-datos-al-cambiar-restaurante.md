@@ -61,10 +61,10 @@
 - [x] **T8 – RestaurantDashboardComponent actualiza el nombre**
   - Test: emitir `rest-1` y luego `rest-2` en `paramMap` cambia `restaurantName()` de un restaurante al otro, con el `RestaurantStore` falso cargado (`restaurant-dashboard.component.spec.ts`).
   - Código: derivar `restaurantId` de `paramMap` y `restaurantName` como `computed` sobre `restaurantStore.getById` (`restaurant-dashboard.component.ts`).
-- [ ] **T9 – Comprobación manual en navegador**
+- [x] **T9 – Comprobación manual en navegador**
   - Test: con API y seed levantados, pulsar Ingredientes de rest-1 y luego de rest-2 en el menú lateral; repetir con Platos, Empleados y Dashboard. Los datos y el nombre cambian (comprobación manual documentada en el PR).
   - Código: solo ajustes si falla algo.
-- [ ] **T10 – Actualizar documentación**
+- [x] **T10 – Actualizar documentación**
   - Test: `npm run test -w @resttek/web-admin` pasa en verde (comprobación del script).
   - Código: actualizar `CLAUDE.md` (la frase "No hay script de lint ni tests en los frontends" y la tabla de comandos) para reflejar que `web-admin` tiene tests (`CLAUDE.md`).
 
