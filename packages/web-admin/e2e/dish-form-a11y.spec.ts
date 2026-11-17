@@ -35,3 +35,24 @@ test('cada control muestra un foco visible de al menos 2px al tabular', async ({
     expect(outlineWidth, `outline-width en ${nombre}`).toBeGreaterThanOrEqual(2)
   }
 })
+
+test('el orden de tabulación sigue el orden visual y no hay tabindex positivos', async ({ dishFormPage: page }) => {
+  expect(await page.locator('main [tabindex]').evaluateAll(els => els.filter(e => Number(e.getAttribute('tabindex')) > 0).length)).toBe(0)
+
+  await page.getByRole('link', { name: 'Volver a platos' }).focus()
+  const orden: string[] = []
+  for (let i = 0; i < 10; i++) {
+    await page.keyboard.press('Tab')
+    orden.push(await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement
+      return el.id || el.getAttribute('aria-label') || el.textContent?.trim() || el.tagName
+    }))
+  }
+  expect(orden).toEqual([
+    'dish-name', 'dish-price', 'dish-category', 'dish-available', 'dish-description',
+    'new-ingredient-id', 'new-ingredient-qty', 'Añadir ingrediente', 'Cancelar', 'Guardar'
+  ])
+
+  await page.keyboard.press('Shift+Tab')
+  await expect(page.locator('main').getByRole('link', { name: 'Cancelar' })).toBeFocused()
+})

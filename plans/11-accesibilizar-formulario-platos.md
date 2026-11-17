@@ -67,9 +67,10 @@
 - [x] **T10 – Foco visible y contraste (solo este formulario)**
   - Test: Playwright comprueba que al tabular a cada control `:focus-visible` tiene `outline` ≠ `none` y ≥ 2px, y que no queda tapado por elementos fijos (`e2e/dish-form-a11y.spec.ts`).
   - Código: regla `:focus-visible` acotada al formulario en `dish-form.component.css` (sin tocar `styles.css` global), con contraste ≥ 3:1 (2.4.7, 2.4.11, 1.4.11).
-- [ ] **T11 – Orden de tabulación lógico**
+- [x] **T11 – Orden de tabulación lógico**
   - Test: Playwright con Tab recorre en orden: volver → nombre → precio → categoría → disponible → descripción → selector ingrediente → cantidad → añadir → cancelar → guardar (`e2e/dish-form-a11y.spec.ts`).
   - Código: ajustar DOM si el orden difiere; sin `tabindex` positivos (`dish-form.component.html`).
+  - Nota: el test pasó a la primera sin cambios de código, porque el orden del DOM ya era lógico tras T3–T6; queda como test de regresión.
 - [ ] **T12 – Revisión automática con axe**
   - Test: `@axe-core/playwright` sobre el formulario vacío y con errores no devuelve violaciones WCAG 2.2 AA (`e2e/dish-form-a11y.spec.ts`).
   - Código: corregir lo que reporte (`dish-form.component.*`).
