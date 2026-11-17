@@ -46,7 +46,7 @@
 - [x] **T3 – IngredientStore: vaciar lista al cambiar de restaurante**
   - Test: al llamar `loadByRestaurant('rest-2')` tras `rest-1`, `ingredients()` es `[]` mientras carga (`ingredient.store.spec.ts`).
   - Código: `this._ingredients.set([])` si el id cambia (`ingredient.store.ts`).
-- [ ] **T4 – DishStore: mismas dos garantías**
+- [x] **T4 – DishStore: mismas dos garantías**
   - Test: mismos dos casos que T2 y T3 para platos (`dishes/store/dish.store.spec.ts`).
   - Código: añadir `_currentRestaurantId` y la misma lógica (`dish.store.ts`).
 - [ ] **T5 – IngredientListComponent reacciona al cambio de ruta**
