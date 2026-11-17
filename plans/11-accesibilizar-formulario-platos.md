@@ -74,7 +74,7 @@
 - [x] **T12 – Revisión automática con axe**
   - Test: `@axe-core/playwright` sobre el formulario vacío y con errores no devuelve violaciones WCAG 2.2 AA (`e2e/dish-form-a11y.spec.ts`).
   - Código: corregir lo que reporte (`dish-form.component.*`).
-- [ ] **T13 – Vídeo de uso con teclado**
+- [x] **T13 – Vídeo de uso con teclado**
   - Test: `e2e/dish-form-keyboard.spec.ts` solo con `page.keyboard` (Tab, Shift+Tab, Espacio, Enter, flechas), sin clics: (1) abre el formulario, (2) pulsa Enter con campos vacíos y se ven los errores, (3) rellena nombre, precio, categoría, disponible y descripción, añade un ingrediente, (4) envía con Enter y comprueba que el plato aparece en la lista.
   - Código: configuración para guardar el vídeo en `docs/a11y/formulario-platos.webm` (copia desde `test-results` tras el test) y pausas breves (`slowMo`) para que se lea bien.
 - [ ] **T14 – Documentar**
