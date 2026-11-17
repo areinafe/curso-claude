@@ -43,7 +43,7 @@
 - [x] **T2 – Helper de login y ruta del formulario**
   - Test: `e2e/helpers.spec.ts`/fixture que inicia sesión como admin y llega a `/restaurants/rest-1/dishes/new` (`e2e/fixtures.ts`).
   - Código: fixture `loggedInPage` reutilizable.
-- [ ] **T3 – Etiquetas asociadas a cada control**
+- [x] **T3 – Etiquetas asociadas a cada control**
   - Test: Vitest + `TestBed`: `getByLabel`-equivalente — cada `input/select/textarea` tiene un `label[for]` con su `id` y el texto correcto (`dish-form.component.spec.ts`).
   - Código: sustituir `div.fake-label` por `<label for>` y añadir `id`s (`dish-form.component.html`).
 - [ ] **T4 – Encabezados y estructura**
