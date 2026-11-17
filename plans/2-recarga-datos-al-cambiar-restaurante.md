@@ -55,7 +55,7 @@
 - [x] **T6 – DishListComponent reacciona al cambio de ruta**
   - Test: igual que T5 para platos (`dish-list.component.spec.ts`).
   - Código: mismo cambio (`dish-list.component.ts`).
-- [ ] **T7 – EmployeeStore + EmployeeListComponent**
+- [x] **T7 – EmployeeStore + EmployeeListComponent**
   - Test: store: una respuesta obsoleta no pisa la actual y la lista se vacía al cambiar de restaurante (`employees/store/employee.store.spec.ts`); componente: emitir `rest-1` y luego `rest-2` llama a `loadByRestaurant` con cada id (`employee-list.component.spec.ts`).
   - Código: misma lógica que T2-T3 en `employee.store.ts` (`loadByRestaurant`) y la suscripción a params en `employee-list.component.ts`.
 - [ ] **T8 – RestaurantDashboardComponent actualiza el nombre**
