@@ -40,7 +40,7 @@
 - [x] **T1 – Instalar y configurar Playwright**
   - Test: `e2e/smoke.spec.ts` abre `http://localhost:4200/login` y comprueba que hay un campo de email (rojo si no hay config) (`packages/web-admin/e2e/smoke.spec.ts`).
   - Código: añadir `@playwright/test` como devDependency, `playwright.config.ts` con `use.video: 'on'`, `baseURL` y script `"e2e"` en `packages/web-admin/package.json`; instalar chromium.
-- [ ] **T2 – Helper de login y ruta del formulario**
+- [x] **T2 – Helper de login y ruta del formulario**
   - Test: `e2e/helpers.spec.ts`/fixture que inicia sesión como admin y llega a `/restaurants/rest-1/dishes/new` (`e2e/fixtures.ts`).
   - Código: fixture `loggedInPage` reutilizable.
 - [ ] **T3 – Etiquetas asociadas a cada control**
