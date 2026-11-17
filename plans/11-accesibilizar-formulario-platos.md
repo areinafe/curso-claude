@@ -52,7 +52,7 @@
 - [x] **T5 – Botones reales operables con teclado**
   - Test: "Guardar", "Cancelar" (enlace), "Añadir ingrediente" y "Quitar <ingrediente>" son `button`/`a` con nombre accesible; pulsar Enter/Espacio sobre "Añadir" añade el ingrediente (`dish-form.component.spec.ts`).
   - Código: `div.btn` → `<button type="button">`, `chip-remove` → `<button aria-label="Quitar …">`, botones solo con icono con `aria-label` (`dish-form.component.html`).
-- [ ] **T6 – Envolver en `<form>` y enviar con Enter**
+- [x] **T6 – Envolver en `<form>` y enviar con Enter**
   - Test: disparar `submit` del `form` llama a `onSubmit`; Guardar es `type="submit"` (`dish-form.component.spec.ts`).
   - Código: `<form (ngSubmit)="onSubmit()" novalidate>`; los botones que no envían llevan `type="button"` (`dish-form.component.html`/`.ts`).
 - [ ] **T7 – Validación de campos obligatorios**

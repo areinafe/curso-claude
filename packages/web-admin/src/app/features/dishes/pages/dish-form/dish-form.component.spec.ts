@@ -89,4 +89,17 @@ describe('DishFormComponent (accesibilidad)', () => {
     fixture.detectChanges()
     expect(component.form.ingredients).toEqual([])
   })
+
+  it('envuelve los campos en un form cuyo envío llama a onSubmit', () => {
+    const component = fixture.componentInstance
+    const onSubmit = vi.spyOn(component, 'onSubmit').mockResolvedValue(undefined)
+    const form = root().querySelector('form')
+    expect(form).not.toBeNull()
+    const guardar = Array.from(form!.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Guardar')
+    expect(guardar?.getAttribute('type')).toBe('submit')
+
+    form!.dispatchEvent(new Event('submit'))
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
 })
