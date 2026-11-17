@@ -52,7 +52,7 @@
 - [x] **T5 – IngredientListComponent reacciona al cambio de ruta**
   - Test: con `TestBed` y un `ActivatedRoute` con `paramMap` observable, emitir `rest-1` y luego `rest-2` provoca dos llamadas a `loadByRestaurant` con cada id (`ingredient-list.component.spec.ts`).
   - Código: sustituir la lectura del snapshot por suscripción a los params (`toSignal`/`effect` sobre `route.parent.paramMap`) y derivar `restaurantId` de ahí (`ingredient-list.component.ts`).
-- [ ] **T6 – DishListComponent reacciona al cambio de ruta**
+- [x] **T6 – DishListComponent reacciona al cambio de ruta**
   - Test: igual que T5 para platos (`dish-list.component.spec.ts`).
   - Código: mismo cambio (`dish-list.component.ts`).
 - [ ] **T7 – EmployeeStore + EmployeeListComponent**
