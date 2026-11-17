@@ -8,7 +8,7 @@
 | Título | Página en blanco al entrar en la url de platos |
 | Fecha | 2026-11-17 |
 | Autor | Ana Reina |
-| Estado | borrador |
+| Estado | completado |
 | Rama | fix/3-pagina-blanco-platos |
 
 ## Objetivo y alcance
@@ -37,17 +37,17 @@
 - [x] **T1 – Añadir `<base href="/">`**
   - Test: antes del cambio, reproducir el fallo abriendo directamente `http://localhost:4200/restaurants/rest-2/dishes` (página en blanco y errores de MIME en consola); es la comprobación "roja" (sin test automático, por decisión del usuario).
   - Código: añadir `<base href="/">` tras `<meta charset>` (`packages/web-admin/src/index.html`).
-- [ ] **T2 – Verificación manual en navegador**
+- [x] **T2 – Verificación manual en navegador**
   - Test: con API y `web-admin` levantados, abrir directamente `/restaurants/rest-2/dishes`, `/restaurants/rest-2/dishes/new` y `/restaurants/rest-2/ingredients`; recargar con F5 estando en cada una. Sin errores en consola (se documenta en el PR).
   - Código: ninguno.
 
 ## Criterios de aceptación
 
-- [ ] Entrar directamente en `/restaurants/rest-2/dishes` muestra la página de platos con sus datos.
-- [ ] Lo mismo con `/restaurants/rest-2/dishes/new`, `/restaurants/rest-2/ingredients` y recargando con F5.
-- [ ] No hay errores de MIME ni 404 de recursos en la consola.
-- [ ] Todos los tests pasan
-- [ ] Todas las tareas están marcadas
+- [x] Entrar directamente en `/restaurants/rest-2/dishes` muestra la página de platos con sus datos.
+- [x] Lo mismo con `/restaurants/rest-2/dishes/new`, `/restaurants/rest-2/ingredients` y recargando con F5.
+- [x] No hay errores de MIME ni 404 de recursos en la consola.
+- [x] Todos los tests pasan
+- [x] Todas las tareas están marcadas
 
 ## Dudas abiertas
 
