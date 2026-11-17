@@ -64,7 +64,7 @@
 - [x] **T9 – Campos obligatorios indicados y autocompletado**
   - Test: `name` y `price` tienen `required` y `aria-required`, y la etiqueta indica "(obligatorio)"; `price` con `min`, `step` e `inputmode` correctos (`dish-form.component.spec.ts`).
   - Código: atributos y texto en etiquetas (`dish-form.component.html`).
-- [ ] **T10 – Foco visible y contraste (solo este formulario)**
+- [x] **T10 – Foco visible y contraste (solo este formulario)**
   - Test: Playwright comprueba que al tabular a cada control `:focus-visible` tiene `outline` ≠ `none` y ≥ 2px, y que no queda tapado por elementos fijos (`e2e/dish-form-a11y.spec.ts`).
   - Código: regla `:focus-visible` acotada al formulario en `dish-form.component.css` (sin tocar `styles.css` global), con contraste ≥ 3:1 (2.4.7, 2.4.11, 1.4.11).
 - [ ] **T11 – Orden de tabulación lógico**

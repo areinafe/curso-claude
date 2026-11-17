@@ -157,3 +157,12 @@ select.form-control {
 .alert-error ul {
   margin: 6px 0 0 20px;
 }
+
+/* Foco visible (WCAG 2.4.7 / 2.4.11 / 1.4.11): contorno de 3px con contraste alto sobre el fondo oscuro */
+.back-link:focus-visible,
+.form-control:focus-visible,
+.btn:focus-visible,
+.chip-remove:focus-visible {
+  outline: 3px solid var(--green-light);
+  outline-offset: 2px;
+}
