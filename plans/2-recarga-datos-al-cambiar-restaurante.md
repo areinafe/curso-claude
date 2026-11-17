@@ -40,7 +40,7 @@
 - [x] **T1 – Preparar runner de tests en web-admin**
   - Test: un test trivial `it('arranca el runner')` que pasa con `ng test` (`packages/web-admin/src/app/features/ingredients/store/ingredient.store.spec.ts`).
   - Código: añadir target `test` (`@angular/build:unit-test`, runner vitest) en `angular.json`, dependencias `vitest` y `jsdom`, y script `"test": "ng test --watch=false"` en `packages/web-admin/package.json`.
-- [ ] **T2 – IngredientStore: descartar respuesta obsoleta**
+- [x] **T2 – IngredientStore: descartar respuesta obsoleta**
   - Test: con un `IngredientService` falso que resuelve la carga de `rest-1` después que la de `rest-2`, tras ambas el store contiene solo los de `rest-2` (`ingredient.store.spec.ts`).
   - Código: usar `_currentRestaurantId` para ignorar resultados/errores/`loading` de cargas que ya no son la actual (`ingredient.store.ts`).
 - [ ] **T3 – IngredientStore: vaciar lista al cambiar de restaurante**

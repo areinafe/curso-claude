@@ -22,11 +22,13 @@ export class IngredientStore {
     this._error.set(null)
     try {
       const data = await firstValueFrom(this.service.getAll(restaurantId))
+      if (this._currentRestaurantId !== restaurantId) return
       this._ingredients.set(data)
     } catch {
+      if (this._currentRestaurantId !== restaurantId) return
       this._error.set('No se pudieron cargar los ingredientes.')
     } finally {
-      this._loading.set(false)
+      if (this._currentRestaurantId === restaurantId) this._loading.set(false)
     }
   }
 
