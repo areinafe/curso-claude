@@ -392,3 +392,20 @@ El sistema de diseño es **dark mode** e incluye:
 > | `web-empleados/src/styles.css` | copia con 46 líneas propias añadidas |
 >
 > En la práctica hay **cuatro copias del design system** y el fichero de `web-shared` es código muerto. Al tocar un estilo común hay que replicarlo en las tres apps, o se desincronizan.
+
+---
+
+## Pruebas e2e y accesibilidad (`web-admin`)
+
+`web-admin` tiene tests unitarios con Vitest (`npm run test -w @resttek/web-admin`) y pruebas e2e con Playwright en `packages/web-admin/e2e/`:
+
+```bash
+npm run seed                          # datos de prueba (el seed modifica packages/api/resttek.db)
+npm run e2e -w @resttek/web-admin     # arranca API y web-admin si no están levantados
+```
+
+- `dish-form-a11y.spec.ts`: foco visible, orden de tabulación y revisión con axe (WCAG 2.2 AA) del formulario de platos.
+- `dish-form-keyboard.spec.ts`: crea un plato usando **solo el teclado** (Tab, Enter, Espacio, flechas), incluyendo el error al enviar con campos vacíos, y graba el vídeo [`docs/a11y/formulario-platos.webm`](../a11y/formulario-platos.webm). Ejecutar este test lo regenera.
+- Las demás ejecuciones guardan sus vídeos en `packages/web-admin/test-results/` (ignorado por git).
+
+Solo el formulario de platos está adaptado a WCAG 2.2 AA: el foco visible se define en su propio CSS, no en el `styles.css` global.
