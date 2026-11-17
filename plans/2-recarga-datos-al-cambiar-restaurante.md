@@ -49,7 +49,7 @@
 - [x] **T4 – DishStore: mismas dos garantías**
   - Test: mismos dos casos que T2 y T3 para platos (`dishes/store/dish.store.spec.ts`).
   - Código: añadir `_currentRestaurantId` y la misma lógica (`dish.store.ts`).
-- [ ] **T5 – IngredientListComponent reacciona al cambio de ruta**
+- [x] **T5 – IngredientListComponent reacciona al cambio de ruta**
   - Test: con `TestBed` y un `ActivatedRoute` con `paramMap` observable, emitir `rest-1` y luego `rest-2` provoca dos llamadas a `loadByRestaurant` con cada id (`ingredient-list.component.spec.ts`).
   - Código: sustituir la lectura del snapshot por suscripción a los params (`toSignal`/`effect` sobre `route.parent.paramMap`) y derivar `restaurantId` de ahí (`ingredient-list.component.ts`).
 - [ ] **T6 – DishListComponent reacciona al cambio de ruta**
