@@ -124,4 +124,27 @@ describe('DishFormComponent (accesibilidad)', () => {
     expect(component.fieldErrors()).toEqual({})
     expect(dishStore.create).toHaveBeenCalledTimes(1)
   })
+
+  it('anuncia los errores y mueve el foco al primer campo inválido', async () => {
+    document.body.appendChild(root())
+    const component = fixture.componentInstance
+    component.form.name = ''
+    component.form.price = 0
+
+    await component.onSubmit()
+    fixture.detectChanges()
+    await fixture.whenStable()
+
+    const nombre = root().querySelector<HTMLInputElement>('#dish-name')!
+    const precio = root().querySelector<HTMLInputElement>('#dish-price')!
+    expect(nombre.getAttribute('aria-invalid')).toBe('true')
+    expect(nombre.getAttribute('aria-describedby')).toBe('dish-name-error')
+    expect(root().querySelector('#dish-name-error')?.textContent).toContain('obligatorio')
+    expect(precio.getAttribute('aria-invalid')).toBe('true')
+    expect(precio.getAttribute('aria-describedby')).toBe('dish-price-error')
+    expect(root().querySelector('#dish-price-error')?.textContent).toContain('mayor que 0')
+    expect(root().querySelector('[role="alert"]')?.textContent).toContain('2 campos')
+    expect(document.activeElement).toBe(nombre)
+    expect(root().querySelector('#dish-category')?.getAttribute('aria-invalid')).toBeNull()
+  })
 })

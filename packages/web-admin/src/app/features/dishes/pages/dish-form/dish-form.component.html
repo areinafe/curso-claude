@@ -9,19 +9,35 @@
   </div>
 
   @if (error()) {
-    <div class="alert-error">{{ error() }}</div>
+    <div class="alert-error" role="alert">{{ error() }}</div>
+  }
+
+  @if (errorCount() > 0) {
+    <div class="alert-error" role="alert">
+      <p>Hay {{ errorCount() }} {{ errorCount() === 1 ? 'campo con errores' : 'campos con errores' }}:</p>
+      <ul>
+        @if (fieldErrors().name) { <li>{{ fieldErrors().name }}</li> }
+        @if (fieldErrors().price) { <li>{{ fieldErrors().price }}</li> }
+      </ul>
+    </div>
   }
 
   <form class="card form-card" (ngSubmit)="onSubmit()" novalidate>
     <div class="form-grid">
       <div class="form-group">
         <label for="dish-name">Nombre del plato</label>
-        <input id="dish-name" type="text" class="form-control" [(ngModel)]="form.name" name="name" placeholder="Ensalada César" />
+        <input id="dish-name" type="text" class="form-control" [attr.aria-invalid]="fieldErrors().name ? 'true' : null" [attr.aria-describedby]="fieldErrors().name ? 'dish-name-error' : null" [(ngModel)]="form.name" name="name" placeholder="Ensalada César" />
+        @if (fieldErrors().name) {
+          <p id="dish-name-error" class="field-error">{{ fieldErrors().name }}</p>
+        }
       </div>
 
       <div class="form-group">
         <label for="dish-price">Precio (€)</label>
-        <input id="dish-price" type="number" class="form-control" [(ngModel)]="form.price" name="price" />
+        <input id="dish-price" type="number" class="form-control" [attr.aria-invalid]="fieldErrors().price ? 'true' : null" [attr.aria-describedby]="fieldErrors().price ? 'dish-price-error' : null" [(ngModel)]="form.price" name="price" />
+        @if (fieldErrors().price) {
+          <p id="dish-price-error" class="field-error">{{ fieldErrors().price }}</p>
+        }
       </div>
 
       <div class="form-group">

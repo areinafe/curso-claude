@@ -58,7 +58,7 @@
 - [x] **T7 – Validación de campos obligatorios**
   - Test: enviar con nombre vacío y precio 0 no llama al store y deja `errors` con `name` y `price` (`dish-form.component.spec.ts`).
   - Código: método `validate()` y señal `fieldErrors`; `onSubmit` aborta si hay errores (`dish-form.component.ts`).
-- [ ] **T8 – Errores accesibles (3.3.1, 3.3.3, 4.1.3)**
+- [x] **T8 – Errores accesibles (3.3.1, 3.3.3, 4.1.3)**
   - Test: tras un envío inválido, cada campo erróneo tiene `aria-invalid="true"` y `aria-describedby` apuntando a un mensaje visible; hay un resumen con `role="alert"` y el foco pasa al primer campo con error (`dish-form.component.spec.ts`).
   - Código: mensajes `<p id="name-error">`, resumen de errores, `focus()` al primer inválido; `alert-error` de la API con `role="alert"` (`dish-form.component.html`/`.ts`).
 - [ ] **T9 – Campos obligatorios indicados y autocompletado**
