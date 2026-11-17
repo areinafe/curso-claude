@@ -58,7 +58,7 @@
 - [x] **T7 – EmployeeStore + EmployeeListComponent**
   - Test: store: una respuesta obsoleta no pisa la actual y la lista se vacía al cambiar de restaurante (`employees/store/employee.store.spec.ts`); componente: emitir `rest-1` y luego `rest-2` llama a `loadByRestaurant` con cada id (`employee-list.component.spec.ts`).
   - Código: misma lógica que T2-T3 en `employee.store.ts` (`loadByRestaurant`) y la suscripción a params en `employee-list.component.ts`.
-- [ ] **T8 – RestaurantDashboardComponent actualiza el nombre**
+- [x] **T8 – RestaurantDashboardComponent actualiza el nombre**
   - Test: emitir `rest-1` y luego `rest-2` en `paramMap` cambia `restaurantName()` de un restaurante al otro, con el `RestaurantStore` falso cargado (`restaurant-dashboard.component.spec.ts`).
   - Código: derivar `restaurantId` de `paramMap` y `restaurantName` como `computed` sobre `restaurantStore.getById` (`restaurant-dashboard.component.ts`).
 - [ ] **T9 – Comprobación manual en navegador**
