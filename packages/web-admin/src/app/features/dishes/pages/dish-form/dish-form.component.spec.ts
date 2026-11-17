@@ -102,4 +102,26 @@ describe('DishFormComponent (accesibilidad)', () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
+
+  it('no envía si faltan el nombre o el precio y registra los errores', async () => {
+    const component = fixture.componentInstance
+    component.form.name = '   '
+    component.form.price = 0
+
+    await component.onSubmit()
+
+    expect(dishStore.create).not.toHaveBeenCalled()
+    expect(Object.keys(component.fieldErrors())).toEqual(['name', 'price'])
+  })
+
+  it('envía cuando el nombre y el precio son válidos', async () => {
+    const component = fixture.componentInstance
+    component.form.name = 'Tarta'
+    component.form.price = 5
+
+    await component.onSubmit()
+
+    expect(component.fieldErrors()).toEqual({})
+    expect(dishStore.create).toHaveBeenCalledTimes(1)
+  })
 })

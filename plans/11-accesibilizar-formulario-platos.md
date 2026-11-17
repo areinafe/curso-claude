@@ -55,7 +55,7 @@
 - [x] **T6 – Envolver en `<form>` y enviar con Enter**
   - Test: disparar `submit` del `form` llama a `onSubmit`; Guardar es `type="submit"` (`dish-form.component.spec.ts`).
   - Código: `<form (ngSubmit)="onSubmit()" novalidate>`; los botones que no envían llevan `type="button"` (`dish-form.component.html`/`.ts`).
-- [ ] **T7 – Validación de campos obligatorios**
+- [x] **T7 – Validación de campos obligatorios**
   - Test: enviar con nombre vacío y precio 0 no llama al store y deja `errors` con `name` y `price` (`dish-form.component.spec.ts`).
   - Código: método `validate()` y señal `fieldErrors`; `onSubmit` aborta si hay errores (`dish-form.component.ts`).
 - [ ] **T8 – Errores accesibles (3.3.1, 3.3.3, 4.1.3)**
