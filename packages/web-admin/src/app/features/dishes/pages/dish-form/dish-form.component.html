@@ -25,16 +25,16 @@
   <form class="card form-card" (ngSubmit)="onSubmit()" novalidate>
     <div class="form-grid">
       <div class="form-group">
-        <label for="dish-name">Nombre del plato</label>
-        <input id="dish-name" type="text" class="form-control" [attr.aria-invalid]="fieldErrors().name ? 'true' : null" [attr.aria-describedby]="fieldErrors().name ? 'dish-name-error' : null" [(ngModel)]="form.name" name="name" placeholder="Ensalada César" />
+        <label for="dish-name">Nombre del plato (obligatorio)</label>
+        <input id="dish-name" type="text" class="form-control" required aria-required="true" autocomplete="off" [attr.aria-invalid]="fieldErrors().name ? 'true' : null" [attr.aria-describedby]="fieldErrors().name ? 'dish-name-error' : null" [(ngModel)]="form.name" name="name" placeholder="Ensalada César" />
         @if (fieldErrors().name) {
           <p id="dish-name-error" class="field-error">{{ fieldErrors().name }}</p>
         }
       </div>
 
       <div class="form-group">
-        <label for="dish-price">Precio (€)</label>
-        <input id="dish-price" type="number" class="form-control" [attr.aria-invalid]="fieldErrors().price ? 'true' : null" [attr.aria-describedby]="fieldErrors().price ? 'dish-price-error' : null" [(ngModel)]="form.price" name="price" />
+        <label for="dish-price">Precio (€) (obligatorio)</label>
+        <input id="dish-price" type="number" class="form-control" required aria-required="true" min="0.01" step="0.01" inputmode="decimal" [attr.aria-invalid]="fieldErrors().price ? 'true' : null" [attr.aria-describedby]="fieldErrors().price ? 'dish-price-error' : null" [(ngModel)]="form.price" name="price" />
         @if (fieldErrors().price) {
           <p id="dish-price-error" class="field-error">{{ fieldErrors().price }}</p>
         }

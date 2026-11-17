@@ -147,4 +147,18 @@ describe('DishFormComponent (accesibilidad)', () => {
     expect(document.activeElement).toBe(nombre)
     expect(root().querySelector('#dish-category')?.getAttribute('aria-invalid')).toBeNull()
   })
+
+  it('indica los campos obligatorios y configura el campo de precio', () => {
+    for (const [id, etiqueta] of [['dish-name', 'Nombre del plato'], ['dish-price', 'Precio']]) {
+      const control = root().querySelector(`#${id}`)!
+      expect(control.hasAttribute('required'), `required ${id}`).toBe(true)
+      expect(control.getAttribute('aria-required'), `aria-required ${id}`).toBe('true')
+      expect(root().querySelector(`label[for="${id}"]`)?.textContent).toContain(`${etiqueta}`)
+      expect(root().querySelector(`label[for="${id}"]`)?.textContent).toContain('(obligatorio)')
+    }
+    const precio = root().querySelector('#dish-price')!
+    expect(precio.getAttribute('min')).toBe('0.01')
+    expect(precio.getAttribute('step')).toBe('0.01')
+    expect(precio.getAttribute('inputmode')).toBe('decimal')
+  })
 })
