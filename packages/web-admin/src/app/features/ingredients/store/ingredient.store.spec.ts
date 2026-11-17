@@ -42,4 +42,19 @@ describe('IngredientStore', () => {
     expect(store.ingredients().map(i => i.id)).toEqual(['b'])
     expect(store.loading()).toBe(false)
   })
+
+  it('vacía la lista mientras carga otro restaurante', async () => {
+    const carga1 = store.loadByRestaurant('rest-1')
+    respuestas['rest-1'].next([ingredient('a', 'rest-1')])
+    respuestas['rest-1'].complete()
+    await carga1
+    expect(store.ingredients()).toHaveLength(1)
+
+    const carga2 = store.loadByRestaurant('rest-2')
+
+    expect(store.ingredients()).toEqual([])
+    respuestas['rest-2'].next([])
+    respuestas['rest-2'].complete()
+    await carga2
+  })
 })

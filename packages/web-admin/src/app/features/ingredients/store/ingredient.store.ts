@@ -17,6 +17,7 @@ export class IngredientStore {
   readonly error = this._error.asReadonly()
 
   async loadByRestaurant(restaurantId: string): Promise<void> {
+    if (this._currentRestaurantId !== restaurantId) this._ingredients.set([])
     this._currentRestaurantId = restaurantId
     this._loading.set(true)
     this._error.set(null)

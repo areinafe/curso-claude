@@ -43,7 +43,7 @@
 - [x] **T2 – IngredientStore: descartar respuesta obsoleta**
   - Test: con un `IngredientService` falso que resuelve la carga de `rest-1` después que la de `rest-2`, tras ambas el store contiene solo los de `rest-2` (`ingredient.store.spec.ts`).
   - Código: usar `_currentRestaurantId` para ignorar resultados/errores/`loading` de cargas que ya no son la actual (`ingredient.store.ts`).
-- [ ] **T3 – IngredientStore: vaciar lista al cambiar de restaurante**
+- [x] **T3 – IngredientStore: vaciar lista al cambiar de restaurante**
   - Test: al llamar `loadByRestaurant('rest-2')` tras `rest-1`, `ingredients()` es `[]` mientras carga (`ingredient.store.spec.ts`).
   - Código: `this._ingredients.set([])` si el id cambia (`ingredient.store.ts`).
 - [ ] **T4 – DishStore: mismas dos garantías**
