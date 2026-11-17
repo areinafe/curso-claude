@@ -8,7 +8,7 @@
 | Título | Accesibilizar el formulario de platos |
 | Fecha | 2026-11-17 |
 | Autor | Ana Reina |
-| Estado | borrador |
+| Estado | completado |
 | Rama | feat/11-accesibilizar-formulario-platos |
 
 ## Objetivo y alcance
@@ -83,13 +83,13 @@
 
 ## Criterios de aceptación
 
-- [ ] El formulario se completa y se envía solo con teclado, con foco siempre visible y orden lógico.
-- [ ] Cada campo tiene etiqueta asociada y los errores se anuncian y asocian al campo (`aria-invalid`, `aria-describedby`, `role="alert"`).
-- [ ] Enviar sin rellenar los campos obligatorios muestra errores y no llama a la API.
-- [ ] axe no reporta violaciones WCAG 2.2 AA en el formulario.
-- [ ] Existe un vídeo con Playwright (`docs/a11y/formulario-platos.webm`) que muestra el uso con teclado (Tab, Espacio, Enter…) para crear un plato nuevo y un error por enviar con campos sin rellenar.
-- [ ] Todos los tests pasan
-- [ ] Todas las tareas están marcadas
+- [x] El formulario se completa y se envía solo con teclado, con foco siempre visible y orden lógico.
+- [x] Cada campo tiene etiqueta asociada y los errores se anuncian y asocian al campo (`aria-invalid`, `aria-describedby`, `role="alert"`).
+- [x] Enviar sin rellenar los campos obligatorios muestra errores y no llama a la API.
+- [x] axe no reporta violaciones WCAG 2.2 AA en el formulario.
+- [x] Existe un vídeo con Playwright (`docs/a11y/formulario-platos.webm`) que muestra el uso con teclado (Tab, Espacio, Enter…) para crear un plato nuevo y un error por enviar con campos sin rellenar.
+- [x] Todos los tests pasan
+- [x] Todas las tareas están marcadas
 
 ## Dudas abiertas
 
