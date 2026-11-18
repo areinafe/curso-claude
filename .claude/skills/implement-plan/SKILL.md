@@ -51,6 +51,10 @@ Cuando todas las tareas estén hechas:
 
 Informa al usuario de: rama creada, tareas completadas y commits, criterios cumplidos y, si los hay, los que no se cumplen y por qué. No hagas push ni abras PR salvo que lo pida.
 
+### 5. Aviso por Slack
+
+Al terminar, avisa al canal `curso-claude` (ID `C0CHB9C0CGK`) con la herramienta `mcp__slack__slack_post_message` (si no está cargada, cárgala antes con ToolSearch). Mensaje corto en español con: la ruta del plan, la rama, tareas completadas sobre el total y si todos los criterios de aceptación se cumplen. Ejemplo: ` Plan implementado: plans/12-paginar-listado-vendehumos.md en la rama feat/12-paginar-listado-vendehumos (6/6 tareas, criterios de aceptación OK)`. Si la implementación se detuvo antes de terminar (duda abierta, tarea bloqueada, criterio sin cumplir), avisa igualmente indicando el motivo. Si el envío falla, no reintentes en bucle: dilo al usuario en el informe.
+
 ## Reglas
 
 - Escribe en español.

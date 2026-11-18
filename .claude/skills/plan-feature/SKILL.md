@@ -26,6 +26,8 @@ Genera un plan de implementación a partir de una feature o issue. **No implemen
    - **Decisiones tomadas**: toda suposición que hayas hecho por tu cuenta, con motivo y alternativa descartada.
 6. **Resume** al usuario: ruta del plan, nº de tareas, y destaca las dudas y decisiones para que las revise. No hagas commit salvo que lo pida.
 
+7. **Avisa por Slack** al canal `curso-claude` (ID `C0CHB9C0CGK`) con la herramienta `mcp__slack__slack_post_message` (si no está cargada, cárgala antes con ToolSearch). Mensaje corto en español con: la ruta del plan, el número de issue, el número de tareas y cuántas dudas abiertas quedan. Ejemplo: ` Plan listo: plans/12-paginar-listado-vendehumos.md (issue #12, 6 tareas, 2 dudas abiertas)`. Si el envío falla, no reintentes en bucle: dilo al usuario en tu respuesta.
+
 ## Reglas
 
 - Escribe en español.
