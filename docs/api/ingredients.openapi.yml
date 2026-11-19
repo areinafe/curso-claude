@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: Resttek API - Ingredientes
+  version: 1.0.0
+  description: |
+    CRUD de ingredientes de un restaurante. Rutas montadas en `/api/v1/restaurants/{restaurantId}/ingredients`.
+
+    Notas de comportamiento real:
+    - Todas las rutas exigen JWT (`authenticate`) y un rol permitido (`authorize`).
+    - `PUT` es un reemplazo completo: se validan y guardan `name`, `unit` y `currentStock`. No se puede cambiar `restaurantId`.
+    - Las consultas por id (`GET/PUT/DELETE /{id}`) no filtran por `restaurantId`: el id del restaurante de la ruta solo se usa en `POST` y en el listado.
+    - Si `currentStock` falta en un `PUT`, no se valida como negativo y la BD (`NOT NULL`) produce un 500.
+    - Un ingrediente referenciado por un plato no se puede borrar de forma limpia si la BD aplica la clave foránea (no hay comprobación en el código).
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Desarrollo local
+tags:
+  - name: Ingredientes
+security:
+  - bearerAuth: []
+paths:
+  /restaurants/{restaurantId}/ingredients:
+    parameters:
+      - $ref: "#/components/parameters/restaurantId"
+    post:
+      tags: [Ingredientes]
+      operationId: crearIngrediente
+      summary: Crear un ingrediente
+      description: "Roles permitidos: `admin`. `currentStock` vale 0 si no se envía."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IngredienteCrear" }
+            example: { name: Tomate, unit: kg, currentStock: 12.5 }
+      responses:
+        "201":
+          description: Ingrediente creado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ingrediente" }
+              example:
+                id: 3f8c1c1e-6a52-4a0e-9d3b-1f0f7b2c9a10
+                name: Tomate
+                unit: kg
+                currentStock: 12.5
+                restaurantId: 9b2e7c34-0d1a-4c55-8a3f-5e6d7c8b9a01
+                createdAt: "2026-11-19T10:00:00.000Z"
+                updatedAt: "2026-11-19T10:00:00.000Z"
+        "400":
+          description: Validación fallida (nombre vacío, stock negativo, unidad inválida o ausente).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                nombre: { value: { error: IngredientNameRequiredError, message: Ingredient name is required } }
+                stock: { value: { error: NegativeStockError, message: "Stock cannot be negative" } }
+                unidad: { value: { error: InvalidUnitError, message: "Invalid unit: litro. Must be one of: kg, g, l, ml, unidad" } }
+                unidadAusente: { value: { error: InvalidUnitError, message: Unit must be provided } }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+    get:
+      tags: [Ingredientes]
+      operationId: listarIngredientes
+      summary: Listar los ingredientes de un restaurante
+      description: "Roles permitidos: `admin`, `manager`, `cocinero`."
+      responses:
+        "200":
+          description: Lista de ingredientes (vacía si no hay ninguno).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Ingrediente" }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+  /restaurants/{restaurantId}/ingredients/{id}:
+    parameters:
+      - $ref: "#/components/parameters/restaurantId"
+      - $ref: "#/components/parameters/ingredientId"
+    get:
+      tags: [Ingredientes]
+      operationId: obtenerIngrediente
+      summary: Obtener un ingrediente por id
+      description: "Roles permitidos: `admin`, `manager`, `cocinero`."
+      responses:
+        "200":
+          description: Ingrediente encontrado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ingrediente" }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/IngredienteNoEncontrado" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+    put:
+      tags: [Ingredientes]
+      operationId: actualizarIngrediente
+      summary: Actualizar un ingrediente (reemplazo completo)
+      description: "Roles permitidos: `admin`. A diferencia del alta, `currentStock` no tiene valor por defecto."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/IngredienteActualizar" }
+            example: { name: Tomate pera, unit: kg, currentStock: 8 }
+      responses:
+        "200":
+          description: Ingrediente actualizado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ingrediente" }
+        "400":
+          description: Validación fallida (mismos errores que el alta).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: NegativeStockError, message: Stock cannot be negative }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/IngredienteNoEncontrado" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+    delete:
+      tags: [Ingredientes]
+      operationId: eliminarIngrediente
+      summary: Eliminar un ingrediente
+      description: "Roles permitidos: `admin`."
+      responses:
+        "204": { description: "Eliminado, sin cuerpo." }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/IngredienteNoEncontrado" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Token JWT obtenido en el login (`/api/v1/auth/login`). Debe enviarse como `Authorization: Bearer <token>`."
+  parameters:
+    restaurantId:
+      name: restaurantId
+      in: path
+      required: true
+      description: Identificador (UUID) del restaurante. El código no comprueba que exista ni que el recurso pertenezca a él.
+      schema: { type: string, format: uuid }
+    ingredientId:
+      name: id
+      in: path
+      required: true
+      description: Identificador (UUID) del ingrediente.
+      schema: { type: string, format: uuid }
+  schemas:
+    Error:
+      type: object
+      description: Error de dominio generado por `errorHandler` (`AppError`).
+      required: [error, message]
+      properties:
+        error: { type: string, description: Nombre de la clase de error, example: NombreDeError }
+        message: { type: string, description: "Mensaje en inglés, tal cual lo lanza el código." }
+    ErrorAutenticacion:
+      type: object
+      description: Respuesta de los middlewares `authenticate` y `authorize` (no pasa por `errorHandler`; no incluye `message`).
+      required: [error]
+      properties:
+        error: { type: string }
+    Ingrediente:
+      type: object
+      required: [id, name, unit, currentStock, restaurantId, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        unit: { $ref: "#/components/schemas/UnidadIngrediente" }
+        currentStock: { type: number, minimum: 0 }
+        restaurantId: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    UnidadIngrediente:
+      type: string
+      enum: [kg, g, l, ml, unidad]
+      description: Se normaliza con `trim()` y minúsculas antes de validar, por lo que se acepta p. ej. " KG ".
+    IngredienteCrear:
+      type: object
+      required: [name, unit]
+      properties:
+        name: { type: string, minLength: 1, description: "No puede estar vacío ni ser solo espacios." }
+        unit: { $ref: "#/components/schemas/UnidadIngrediente" }
+        currentStock: { type: number, minimum: 0, default: 0 }
+    IngredienteActualizar:
+      type: object
+      required: [name, unit, currentStock]
+      properties:
+        name: { type: string, minLength: 1 }
+        unit: { $ref: "#/components/schemas/UnidadIngrediente" }
+        currentStock: { type: number, minimum: 0 }
+  responses:
+    NoAutenticado:
+      description: Falta la cabecera Bearer, el token está mal formado o es inválido.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorAutenticacion" }
+          examples:
+            sinToken: { value: { error: "Unauthorized: No token provided" } }
+            tokenMalformado: { value: { error: "Unauthorized: Malformed token" } }
+            tokenInvalido: { value: { error: "Unauthorized: Invalid token" } }
+    Prohibido:
+      description: El rol del usuario no está entre los permitidos para la operación.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorAutenticacion" }
+          example: { error: "Forbidden: Insufficient permissions" }
+    ErrorInterno:
+      description: Error no controlado (cualquier excepción que no sea `AppError`, p. ej. un `Error` genérico o un `TypeError` por tipos incorrectos en el cuerpo).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: InternalServerError, message: Something went wrong }
+    IngredienteNoEncontrado:
+      description: El ingrediente no existe.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: IngredientNotFoundError, message: Ingredient not found }

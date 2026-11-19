@@ -29,10 +29,24 @@
 
 > Cada tarea debe poder hacerse en 5-10 min e incluye el test (TDD: rojo) y el código mínimo para que pase (verde).
 
+> Separadas por sección/aplicación para que varios agentes puedan trabajar en paralelo. Cada sección solo toca ficheros de su paquete. Ids de tarea únicos en todo el plan.
+
+### <Sección, ej. API (`packages/api`)>
+
+> Depende de: ninguna
+
 - [ ] **T1 – <título>**
   - Test: <qué test se escribe primero y qué comprueba> (`<ruta/del/test>`)
   - Código: <código mínimo para pasar el test> (`<ruta/del/archivo>`)
 - [ ] **T2 – <título>**
+  - Test: <...>
+  - Código: <...>
+
+### <Otra sección, ej. web-admin>
+
+> Depende de: <sección o ninguna>
+
+- [ ] **T3 – <título>**
   - Test: <...>
   - Código: <...>
 
