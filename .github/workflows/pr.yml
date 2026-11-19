@@ -1,0 +1,96 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests (api y web-admin)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tests de la API
+        run: npm test
+      - name: Tests de web-admin
+        run: npm run test -w @resttek/web-admin
+        # web-empleados y web-clientes no tienen tests
+
+  build:
+    name: Build (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [web-admin, web-empleados, web-clientes]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @resttek/${{ matrix.app }}
+
+  lint-docs:
+    name: Lint de la documentación (Redocly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lint de los OpenAPI
+        run: npx --yes @redocly/cli@latest lint docs/api/*.openapi.yml
+
+  revision-docs:
+    name: Revisión de consistencia con la documentación (Claude)
+    runs-on: ubuntu-latest
+    # Los PR de forks no tienen acceso a secretos
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*),Bash(gh pr comment:*),Bash(gh pr diff:*)"
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR: ${{ github.event.pull_request.number }}
+
+            Responde y comenta siempre en español.
+
+            Revisa los cambios de esta PR (`git diff origin/${{ github.base_ref }}...HEAD`) y comprueba que siguen siendo
+            consistentes con la documentación del proyecto: CLAUDE.md, `docs/arquitectura/`, `docs/dominio/`
+            (glosario y modelo de datos) y `docs/api/*.openapi.yml`.
+
+            Busca en concreto:
+            - Código que contradice lo que dice la documentación (arquitectura, convenciones, flujos como el de estados de pedidos, roles, errores, BD).
+            - Cambios en rutas, DTOs, validaciones o errores de la API sin la actualización correspondiente de `docs/api/`.
+            - Cambios en el modelo de datos o en términos de dominio no reflejados en `docs/dominio/`.
+            - Documentación que queda desactualizada por los cambios.
+            Ten en cuenta que la documentación recoge inconsistencias que existen a propósito; no las reportes si la PR no las toca.
+
+            Si NO hay inconsistencias, no comentes nada.
+            Si las hay, publica UN solo comentario en la PR con `gh pr comment ${{ github.event.pull_request.number }} --body "..."`,
+            con una lista de las inconsistencias: fichero/línea del cambio, documento afectado y qué habría que corregir
+            (código o documentación). Empieza el comentario con "## Revisión de consistencia con la documentación" para que
+            alguien lo revise. No modifiques ningún fichero.
