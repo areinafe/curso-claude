@@ -68,4 +68,21 @@ export class TableController {
             next(error)
         }
     }
+    getAvailable = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const tables = await this.tableService.findAvailable(req.params.restaurantId as string, req.query.people)
+            res.status(200).json(tables)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    occupy = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const table = await this.tableService.occupy(req.params.restaurantId as string, req.params.id as string)
+            res.status(200).json(table)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

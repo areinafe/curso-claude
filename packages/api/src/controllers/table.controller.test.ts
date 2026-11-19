@@ -119,4 +119,28 @@ describe('TableController', () => {
         expect(next).toHaveBeenCalledWith(error)
         expect(res.status).not.toHaveBeenCalled()
     })
+    it('getAvailable lee req.query.people tal cual y responde 200 con las mesas', async () => {
+        service.findAvailable.mockResolvedValue([table])
+        await call('getAvailable', createReq({ query: { people: '3' } as any }))
+        expect(service.findAvailable).toHaveBeenCalledWith('r1', '3')
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith([table])
+    })
+
+    it('occupy pasa restaurantId e id y responde 200 con la mesa ocupada', async () => {
+        service.occupy.mockResolvedValue({ ...table, status: 'ocupada' })
+        await call('occupy', createReq({ params: { restaurantId: 'r1', id: 't1' } }))
+        expect(service.occupy).toHaveBeenCalledWith('r1', 't1')
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({ ...table, status: 'ocupada' })
+    })
+
+    it.each(['getAvailable', 'occupy'] as const)('%s pasa los errores a next', async (method) => {
+        const error = new TableNotFoundError()
+        const serviceMethod = method === 'getAvailable' ? 'findAvailable' : 'occupy'
+        service[serviceMethod].mockRejectedValue(error)
+        await call(method, createReq({ params: { restaurantId: 'r1', id: 't1' } }))
+        expect(next).toHaveBeenCalledWith(error)
+        expect(res.status).not.toHaveBeenCalled()
+    })
 })
