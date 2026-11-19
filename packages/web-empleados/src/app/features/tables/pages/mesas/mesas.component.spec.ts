@@ -4,6 +4,26 @@ import { AuthStore } from '@resttek/web-shared'
 import { MesasComponent } from './mesas.component'
 import { TableStore } from '../../store/table.store'
 import type { Table, TableStatus } from '../../models/table.model'
+import { OrderStore } from '../../../orders/store/order.store'
+import type { Order, OrderStatus } from '../../../orders/models/order.model'
+
+function pedido(id: string, tableId: string | null, ...estados: OrderStatus[]): Order {
+  return {
+    id,
+    restaurantId: 'rest-1',
+    tableId,
+    clientId: null,
+    createdAt: '',
+    items: estados.map((status, i) => ({
+      id: `${id}-item-${i}`,
+      dishId: `plato-${i}`,
+      quantity: 1,
+      notes: null,
+      status,
+      dishName: `Plato ${id}-${i}`
+    }))
+  }
+}
 
 function mesa(id: string, number: number, status: TableStatus): Table {
   return {
@@ -27,12 +47,19 @@ describe('MesasComponent', () => {
     loadTables: ReturnType<typeof vi.fn>
     updateStatus: ReturnType<typeof vi.fn>
   }
+  let orders: ReturnType<typeof signal<Order[]>>
+  let orderStore: {
+    orders: () => Order[]
+    startPolling: ReturnType<typeof vi.fn>
+    stopPolling: ReturnType<typeof vi.fn>
+  }
 
   function render() {
     TestBed.configureTestingModule({
       imports: [MesasComponent],
       providers: [
         { provide: TableStore, useValue: tableStore },
+        { provide: OrderStore, useValue: orderStore },
         { provide: AuthStore, useValue: { user: () => ({ restaurantId: 'rest-1' }) } }
       ]
     })
@@ -49,6 +76,12 @@ describe('MesasComponent', () => {
       error: () => null,
       loadTables: vi.fn().mockResolvedValue(undefined),
       updateStatus: vi.fn().mockResolvedValue(undefined)
+    }
+    orders = signal<Order[]>([])
+    orderStore = {
+      orders: orders.asReadonly(),
+      startPolling: vi.fn(),
+      stopPolling: vi.fn()
     }
   })
 
@@ -79,5 +112,47 @@ describe('MesasComponent', () => {
     selector.dispatchEvent(new Event('change'))
 
     expect(tableStore.updateStatus).toHaveBeenCalledWith('rest-1', 't1', 'reservada')
+  })
+
+  describe('pedidos de las mesas ocupadas', () => {
+    function pedidosDe(el: HTMLElement, indiceMesa: number): string[] {
+      const tarjeta = el.querySelectorAll('[data-testid="mesa"]')[indiceMesa]
+      return Array.from(tarjeta.querySelectorAll('[data-testid="pedido"]')).map(p => p.textContent ?? '')
+    }
+
+    it('arranca el polling de pedidos al entrar y lo para al salir', () => {
+      const fixture = render()
+      expect(orderStore.startPolling).toHaveBeenCalledWith('rest-1')
+
+      fixture.destroy()
+      expect(orderStore.stopPolling).toHaveBeenCalled()
+    })
+
+    it('lista en una mesa ocupada sus pedidos activos con el estado de los ítems', () => {
+      orders.set([pedido('p1', 't2', 'pendiente', 'listo'), pedido('p2', 't2', 'preparando')])
+
+      const pedidos = pedidosDe(render().nativeElement, 1)
+
+      expect(pedidos).toHaveLength(2)
+      expect(pedidos[0]).toContain('Plato p1-0')
+      expect(pedidos[0]).toContain('pendiente')
+      expect(pedidos[0]).toContain('Plato p1-1')
+      expect(pedidos[0]).toContain('listo')
+      expect(pedidos[1]).toContain('preparando')
+    })
+
+    it('no muestra pedidos en las mesas libres', () => {
+      orders.set([pedido('p1', 't1', 'pendiente')])
+
+      expect(pedidosDe(render().nativeElement, 0)).toHaveLength(0)
+    })
+
+    it('ignora pedidos sin mesa o con una mesa que no existe', () => {
+      orders.set([pedido('p1', null, 'pendiente'), pedido('p2', 'mesa-borrada', 'pendiente'), pedido('p3', '2', 'pendiente')])
+
+      const el: HTMLElement = render().nativeElement
+
+      expect(el.querySelectorAll('[data-testid="pedido"]')).toHaveLength(0)
+    })
   })
 })
