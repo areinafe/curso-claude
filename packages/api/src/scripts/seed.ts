@@ -71,6 +71,24 @@ const seed = async () => {
 
         console.log('Restaurants created.')
 
+        // Mesas: 6 por restaurante con ids fijos (table-<restaurante>-<número>).
+        // La mesa 5 de rest-1 se siembra ocupada porque tiene el pedido de ejemplo.
+        const tableCapacities = [2, 2, 4, 4, 6, 8]
+        for (const restaurantId of ['rest-1', 'rest-2']) {
+            for (const [index, capacity] of tableCapacities.entries()) {
+                const number = index + 1
+                const tableId = `table-${restaurantId}-${number}`
+                const status = tableId === 'table-rest-1-5' ? 'ocupada' : 'libre'
+                const now = new Date().toISOString()
+                await dbConfig.run(`
+                    INSERT OR IGNORE INTO tables (id, restaurant_id, number, description, capacity, status, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                `, [tableId, restaurantId, number, `Mesa ${number}`, capacity, status, now, now])
+            }
+        }
+
+        console.log('Tables created: 6 per restaurant')
+
         const ingredientsRest1 = [
             { id: randomUUID(), name: 'Tomate', unit: 'kg' },
             { id: randomUUID(), name: 'Queso mozzarella', unit: 'kg' },
@@ -162,7 +180,7 @@ const seed = async () => {
         await dbConfig.run(`
             INSERT OR IGNORE INTO orders (id, restaurant_id, table_id, client_id, created_at)
             VALUES (?, ?, ?, ?, ?)
-        `, [order1Id, 'rest-1', '5', null, new Date().toISOString()])
+        `, [order1Id, 'rest-1', 'table-rest-1-5', null, new Date().toISOString()])
 
         for (let i = 0; i < 2; i++) {
             await dbConfig.run(`
