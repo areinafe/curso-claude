@@ -7,7 +7,9 @@ import {
     InvalidTableStatusError,
     RestaurantIdRequiredError,
     DuplicatedTableNumberError,
-    TableNotFoundError
+    TableNotFoundError,
+    TableNotAvailableError,
+    InvalidPeopleCountError
 } from '@errors/DomainErrors.js'
 
 describe('TableService', () => {
@@ -164,6 +166,90 @@ describe('TableService', () => {
             await expect(service.delete('r1', 'no-existe')).rejects.toThrow(TableNotFoundError)
             await expect(service.delete('r2', created.id)).rejects.toThrow(TableNotFoundError)
             expect(await repo.findById(created.id)).not.toBeNull()
+        })
+    })
+    describe('updateStatus', () => {
+        it('normaliza y guarda el nuevo estado', async () => {
+            const created = await service.create(validInput)
+            const updated = await service.updateStatus('r1', created.id, ' OCUPADA ')
+            expect(updated.status).toBe('ocupada')
+            expect((await repo.findById(created.id))?.status).toBe('ocupada')
+        })
+
+        it('acepta cualquier transición, incluido el mismo estado', async () => {
+            const created = await service.create({ ...validInput, status: 'ocupada' })
+            expect((await service.updateStatus('r1', created.id, 'reservada')).status).toBe('reservada')
+            expect((await service.updateStatus('r1', created.id, 'libre')).status).toBe('libre')
+            expect((await service.updateStatus('r1', created.id, 'libre')).status).toBe('libre')
+        })
+
+        it('lanza InvalidTableStatusError con un estado inválido o ausente', async () => {
+            const created = await service.create(validInput)
+            await expect(service.updateStatus('r1', created.id, 'rota')).rejects.toThrow(InvalidTableStatusError)
+            await expect(service.updateStatus('r1', created.id, undefined)).rejects.toThrow(InvalidTableStatusError)
+        })
+
+        it('lanza TableNotFoundError si no existe o es de otro restaurante', async () => {
+            const created = await service.create(validInput)
+            await expect(service.updateStatus('r1', 'no-existe', 'libre')).rejects.toThrow(TableNotFoundError)
+            await expect(service.updateStatus('r2', created.id, 'ocupada')).rejects.toThrow(TableNotFoundError)
+            expect((await repo.findById(created.id))?.status).toBe('libre')
+        })
+    })
+
+    describe('findAvailable', () => {
+        beforeEach(async () => {
+            await service.create({ ...validInput, number: 1, capacity: 2 })
+            await service.create({ ...validInput, number: 2, capacity: 6 })
+            await service.create({ ...validInput, number: 3, capacity: 4 })
+            await service.create({ ...validInput, number: 4, capacity: 8, status: 'ocupada' })
+            await service.create({ ...validInput, restaurantId: 'r2', number: 1, capacity: 8 })
+        })
+
+        it('devuelve las mesas libres con capacidad suficiente ordenadas por capacidad y número', async () => {
+            const tables = await service.findAvailable('r1', '3')
+            expect(tables.map(t => t.number)).toEqual([3, 2])
+        })
+
+        it('acepta people como número', async () => {
+            const tables = await service.findAvailable('r1', 2)
+            expect(tables.map(t => t.number)).toEqual([1, 3, 2])
+        })
+
+        it('devuelve [] si no hay mesas', async () => {
+            expect(await service.findAvailable('r1', '20')).toEqual([])
+        })
+
+        it.each([undefined, '', 'abc', '2.5', '0', '-1', 0, 2.5, ['2']])('lanza InvalidPeopleCountError con people = %s', async (people) => {
+            await expect(service.findAvailable('r1', people)).rejects.toThrow(InvalidPeopleCountError)
+        })
+    })
+
+    describe('occupy', () => {
+        it('marca la mesa libre como ocupada y la devuelve', async () => {
+            const created = await service.create(validInput)
+            const occupied = await service.occupy('r1', created.id)
+            expect(occupied).toMatchObject({ id: created.id, status: 'ocupada' })
+            expect((await repo.findById(created.id))?.status).toBe('ocupada')
+        })
+
+        it.each(['ocupada', 'reservada'])('lanza TableNotAvailableError si la mesa está %s', async (status) => {
+            const created = await service.create({ ...validInput, status })
+            await expect(service.occupy('r1', created.id)).rejects.toThrow(TableNotAvailableError)
+        })
+
+        it('solo uno de dos intentos simultáneos ocupa la mesa', async () => {
+            const created = await service.create(validInput)
+            const results = await Promise.allSettled([service.occupy('r1', created.id), service.occupy('r1', created.id)])
+            expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1)
+            expect(results.filter(r => r.status === 'rejected')).toHaveLength(1)
+        })
+
+        it('lanza TableNotFoundError si no existe o es de otro restaurante', async () => {
+            const created = await service.create(validInput)
+            await expect(service.occupy('r1', 'no-existe')).rejects.toThrow(TableNotFoundError)
+            await expect(service.occupy('r2', created.id)).rejects.toThrow(TableNotFoundError)
+            expect((await repo.findById(created.id))?.status).toBe('libre')
         })
     })
 })

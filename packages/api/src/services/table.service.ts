@@ -7,7 +7,9 @@ import {
     InvalidTableCapacityError,
     RestaurantIdRequiredError,
     DuplicatedTableNumberError,
-    TableNotFoundError
+    TableNotFoundError,
+    TableNotAvailableError,
+    InvalidPeopleCountError
 } from '@errors/DomainErrors.js'
 
 export interface CreateTableDTO {
@@ -82,6 +84,30 @@ export class TableService {
         return this.tableRepository.findByRestaurantId(restaurantId)
     }
 
+    async updateStatus(restaurantId: string, id: string, status: unknown): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+        const updated: Table = {
+            ...existing,
+            status: normalizeTableStatus(status),
+            updatedAt: new Date().toISOString()
+        }
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async findAvailable(restaurantId: string, people: unknown): Promise<Table[]> {
+        return this.tableRepository.findAvailable(restaurantId, parsePeopleCount(people))
+    }
+
+    async occupy(restaurantId: string, id: string): Promise<Table> {
+        await this.findById(restaurantId, id)
+        const occupied = await this.tableRepository.occupyIfFree(id)
+        if (!occupied) {
+            throw new TableNotAvailableError()
+        }
+        return this.findById(restaurantId, id)
+    }
+
     private async ensureNumberIsUnique(table: Table): Promise<void> {
         const tables = await this.tableRepository.findByRestaurantId(table.restaurantId)
         if (tables.some(t => t.number === table.number && t.id !== table.id)) {
@@ -124,6 +150,12 @@ export class TableService {
 
 function isPositiveInteger(value: unknown): value is number {
     return typeof value === 'number' && Number.isInteger(value) && value >= 1
+}
+
+function parsePeopleCount(value: unknown): number {
+    if (isPositiveInteger(value)) return value
+    if (typeof value === 'string' && /^[1-9]\d*$/.test(value)) return Number(value)
+    throw new InvalidPeopleCountError()
 }
 
 function normalizeDescription(value: unknown): string | null {
