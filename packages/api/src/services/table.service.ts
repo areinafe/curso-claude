@@ -6,11 +6,19 @@ import {
     InvalidTableNumberError,
     InvalidTableCapacityError,
     RestaurantIdRequiredError,
-    DuplicatedTableNumberError
+    DuplicatedTableNumberError,
+    TableNotFoundError
 } from '@errors/DomainErrors.js'
 
 export interface CreateTableDTO {
     restaurantId: string
+    number: unknown
+    description?: unknown
+    capacity: unknown
+    status?: unknown
+}
+
+export interface UpdateTableDTO {
     number: unknown
     description?: unknown
     capacity: unknown
@@ -36,6 +44,42 @@ export class TableService {
         await this.ensureNumberIsUnique(table)
         await this.tableRepository.save(table)
         return table
+    }
+
+    async update(restaurantId: string, id: string, dto: UpdateTableDTO): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+
+        const updated = this.buildTable({
+            id: existing.id,
+            restaurantId: existing.restaurantId,
+            number: dto.number,
+            description: dto.description,
+            capacity: dto.capacity,
+            status: dto.status ?? existing.status,
+            createdAt: existing.createdAt,
+            updatedAt: new Date().toISOString()
+        })
+
+        await this.ensureNumberIsUnique(updated)
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async delete(restaurantId: string, id: string): Promise<void> {
+        await this.findById(restaurantId, id)
+        await this.tableRepository.delete(id)
+    }
+
+    async findById(restaurantId: string, id: string): Promise<Table> {
+        const table = await this.tableRepository.findById(id)
+        if (!table || table.restaurantId !== restaurantId) {
+            throw new TableNotFoundError()
+        }
+        return table
+    }
+
+    async findByRestaurantId(restaurantId: string): Promise<Table[]> {
+        return this.tableRepository.findByRestaurantId(restaurantId)
     }
 
     private async ensureNumberIsUnique(table: Table): Promise<void> {
