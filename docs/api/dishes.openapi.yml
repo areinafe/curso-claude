@@ -1,0 +1,287 @@
+openapi: 3.0.3
+info:
+  title: Resttek API - Platos
+  version: 1.0.0
+  description: |
+    CRUD de platos de un restaurante y carta pública. Rutas bajo `/api/v1`:
+    `/restaurants/{restaurantId}/dishes` (autenticadas) y `/public/restaurants/{restaurantId}/dishes` (sin autenticación).
+
+    Notas de comportamiento real:
+    - `PUT` es un reemplazo completo, incluida la lista de `ingredients` (se borran y reinsertan). Si se omite `ingredients` queda vacía; si se omite `description` queda `null`.
+    - En `PUT`, `available` no tiene valor por defecto: si se omite, el plato se guarda con `available` indefinido (comportamiento no controlado).
+    - `price` se valida solo con `price <= 0`; si falta o no es numérico no se detecta como `InvalidPriceError`.
+    - Un `category` ausente o no string, o un `name` no string, provocan un `TypeError` (500).
+    - Los errores de ingredientes (`ingredientId` vacío, `quantity <= 0`) lanzan un `Error` genérico, por lo que responden 500 y no 400.
+    - No se comprueba que cada `ingredientId` exista (la clave foránea de BD puede causar un 500) ni que se repita (clave primaria compuesta, 500).
+    - Las consultas por id no filtran por `restaurantId`.
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Desarrollo local
+tags:
+  - name: Platos
+  - name: Carta pública
+security:
+  - bearerAuth: []
+paths:
+  /restaurants/{restaurantId}/dishes:
+    parameters:
+      - $ref: "#/components/parameters/restaurantId"
+    post:
+      tags: [Platos]
+      operationId: crearPlato
+      summary: Crear un plato
+      description: "Roles permitidos: `admin`, `manager`. `available` vale `true` y `ingredients` `[]` si no se envían."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlatoCrear" }
+            example:
+              name: Paella valenciana
+              description: Arroz con pollo y verduras
+              price: 14.5
+              category: principal
+              available: true
+              ingredients:
+                - { ingredientId: 3f8c1c1e-6a52-4a0e-9d3b-1f0f7b2c9a10, quantity: 0.2 }
+      responses:
+        "201":
+          description: Plato creado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Plato" }
+              examples: { ejemplo: { $ref: "#/components/examples/Plato" } }
+        "400": { $ref: "#/components/responses/ValidacionPlato" }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+    get:
+      tags: [Platos]
+      operationId: listarPlatos
+      summary: Listar los platos de un restaurante (incluye no disponibles)
+      description: "Roles permitidos: `admin`, `manager`, `camarero`, `cocinero`."
+      responses:
+        "200":
+          description: Lista de platos (vacía si no hay ninguno).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Plato" }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+  /restaurants/{restaurantId}/dishes/{id}:
+    parameters:
+      - $ref: "#/components/parameters/restaurantId"
+      - $ref: "#/components/parameters/dishId"
+    get:
+      tags: [Platos]
+      operationId: obtenerPlato
+      summary: Obtener un plato por id
+      description: "Roles permitidos: `admin`, `manager`, `camarero`, `cocinero`."
+      responses:
+        "200":
+          description: Plato encontrado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Plato" }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/PlatoNoEncontrado" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+    put:
+      tags: [Platos]
+      operationId: actualizarPlato
+      summary: Actualizar un plato (reemplazo completo)
+      description: "Roles permitidos: `admin`, `manager`."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlatoActualizar" }
+            example:
+              name: Paella valenciana
+              description: null
+              price: 15
+              category: principal
+              available: false
+              ingredients: []
+      responses:
+        "200":
+          description: Plato actualizado.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Plato" }
+        "400": { $ref: "#/components/responses/ValidacionPlato" }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/PlatoNoEncontrado" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+    delete:
+      tags: [Platos]
+      operationId: eliminarPlato
+      summary: Eliminar un plato
+      description: "Roles permitidos: `admin`, `manager`. Borra también sus filas de `dish_ingredients`."
+      responses:
+        "204": { description: "Eliminado, sin cuerpo." }
+        "401": { $ref: "#/components/responses/NoAutenticado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/PlatoNoEncontrado" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+  /public/restaurants/{restaurantId}/dishes:
+    parameters:
+      - $ref: "#/components/parameters/restaurantId"
+    get:
+      tags: [Carta pública]
+      operationId: listarPlatosPublicos
+      summary: Listar los platos disponibles de un restaurante
+      description: Sin autenticación. Devuelve solo los platos con `available = true`.
+      security: []
+      responses:
+        "200":
+          description: Platos disponibles (vacía si no hay ninguno).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Plato" }
+        "500": { $ref: "#/components/responses/ErrorInterno" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Token JWT obtenido en el login (`/api/v1/auth/login`). Debe enviarse como `Authorization: Bearer <token>`."
+  parameters:
+    restaurantId:
+      name: restaurantId
+      in: path
+      required: true
+      description: Identificador (UUID) del restaurante. El código no comprueba que exista ni que el recurso pertenezca a él.
+      schema: { type: string, format: uuid }
+    dishId:
+      name: id
+      in: path
+      required: true
+      description: Identificador (UUID) del plato.
+      schema: { type: string, format: uuid }
+  schemas:
+    Error:
+      type: object
+      description: Error de dominio generado por `errorHandler` (`AppError`).
+      required: [error, message]
+      properties:
+        error: { type: string, description: Nombre de la clase de error, example: NombreDeError }
+        message: { type: string, description: "Mensaje en inglés, tal cual lo lanza el código." }
+    ErrorAutenticacion:
+      type: object
+      description: Respuesta de los middlewares `authenticate` y `authorize` (no pasa por `errorHandler`; no incluye `message`).
+      required: [error]
+      properties:
+        error: { type: string }
+    CategoriaPlato:
+      type: string
+      enum: [entrante, principal, postre, bebida]
+      description: Se normaliza con `trim()` y minúsculas antes de validar.
+    IngredientePlato:
+      type: object
+      required: [ingredientId, quantity]
+      properties:
+        ingredientId: { type: string, minLength: 1 }
+        quantity: { type: number, minimum: 0, exclusiveMinimum: true, description: "Cantidad por ración, en la unidad del ingrediente." }
+    Plato:
+      type: object
+      required: [id, name, description, price, category, available, restaurantId, ingredients, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        price: { type: number }
+        category: { $ref: "#/components/schemas/CategoriaPlato" }
+        available: { type: boolean }
+        restaurantId: { type: string }
+        ingredients:
+          type: array
+          items: { $ref: "#/components/schemas/IngredientePlato" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    PlatoCrear:
+      type: object
+      required: [name, price, category]
+      properties:
+        name: { type: string, minLength: 1 }
+        description: { type: string, nullable: true, default: null }
+        price: { type: number, minimum: 0, exclusiveMinimum: true }
+        category: { $ref: "#/components/schemas/CategoriaPlato" }
+        available: { type: boolean, default: true }
+        ingredients:
+          type: array
+          default: []
+          items: { $ref: "#/components/schemas/IngredientePlato" }
+    PlatoActualizar:
+      type: object
+      required: [name, price, category, available]
+      properties:
+        name: { type: string, minLength: 1 }
+        description: { type: string, nullable: true, default: null }
+        price: { type: number, minimum: 0, exclusiveMinimum: true }
+        category: { $ref: "#/components/schemas/CategoriaPlato" }
+        available: { type: boolean }
+        ingredients:
+          type: array
+          default: []
+          items: { $ref: "#/components/schemas/IngredientePlato" }
+  responses:
+    NoAutenticado:
+      description: Falta la cabecera Bearer, el token está mal formado o es inválido.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorAutenticacion" }
+          examples:
+            sinToken: { value: { error: "Unauthorized: No token provided" } }
+            tokenMalformado: { value: { error: "Unauthorized: Malformed token" } }
+            tokenInvalido: { value: { error: "Unauthorized: Invalid token" } }
+    Prohibido:
+      description: El rol del usuario no está entre los permitidos para la operación.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorAutenticacion" }
+          example: { error: "Forbidden: Insufficient permissions" }
+    ErrorInterno:
+      description: Error no controlado (cualquier excepción que no sea `AppError`, p. ej. un `Error` genérico o un `TypeError` por tipos incorrectos en el cuerpo).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: InternalServerError, message: Something went wrong }
+
+    ValidacionPlato:
+      description: Validación fallida.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            nombre: { value: { error: DishNameRequiredError, message: Dish name is required } }
+            precio: { value: { error: InvalidPriceError, message: Price must be a positive number } }
+            categoria: { value: { error: InvalidCategoryError, message: "Invalid category: sopa. Must be one of: entrante, principal, postre, bebida" } }
+    PlatoNoEncontrado:
+      description: El plato no existe.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: DishNotFoundError, message: Dish not found }
+  examples:
+    Plato:
+      value:
+        id: 7d0b4a52-3c1e-4f6a-8b9d-2e1f0a3c4b5d
+        name: Paella valenciana
+        description: Arroz con pollo y verduras
+        price: 14.5
+        category: principal
+        available: true
+        restaurantId: 9b2e7c34-0d1a-4c55-8a3f-5e6d7c8b9a01
+        ingredients:
+          - { ingredientId: 3f8c1c1e-6a52-4a0e-9d3b-1f0f7b2c9a10, quantity: 0.2 }
+        createdAt: "2026-11-19T10:00:00.000Z"
+        updatedAt: "2026-11-19T10:00:00.000Z"
