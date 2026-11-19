@@ -162,3 +162,45 @@ export class OrderNotFoundError extends AppError {
   }
 }
 
+
+export class TableNotFoundError extends AppError {
+  constructor() {
+    super('Table not found')
+  }
+}
+
+export class InvalidTableNumberError extends AppError {
+  constructor() {
+    super('Table number must be an integer greater than or equal to 1')
+  }
+}
+
+export class InvalidTableCapacityError extends AppError {
+  constructor() {
+    super('Table capacity must be an integer greater than or equal to 1')
+  }
+}
+
+export class InvalidTableStatusError extends AppError {
+  constructor(message?: string) {
+    super(message ?? 'Invalid table status')
+  }
+}
+
+export class DuplicatedTableNumberError extends AppError {
+  constructor() {
+    super('A table with this number already exists in the restaurant')
+  }
+}
+
+export class TableNotAvailableError extends AppError {
+  constructor() {
+    super('Table is not available')
+  }
+}
+
+export class InvalidPeopleCountError extends AppError {
+  constructor() {
+    super('People count must be an integer greater than or equal to 1')
+  }
+}
